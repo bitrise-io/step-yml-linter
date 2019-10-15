@@ -1,4 +1,4 @@
-title: jjj
+title: my title
 summary: |-
   Run Xcode Archive command and then Export an IPA from the archive.
   Run Xcode Archive command and then Export an IPA from the archive.
@@ -15,6 +15,10 @@ description: |-
 website: https://github.com/bitrise-steplib/steps-xcode-archive
 source_code_url: https://github.com/bitrise-steplib/steps-xcode-archive
 support_url: https://github.com/bitrise-steplib/steps-xcode-archive/issues
+
+meta:
+  test: nooo
+
 host_os_tags:
   - "osx-10.10"
 project_type_tags:
