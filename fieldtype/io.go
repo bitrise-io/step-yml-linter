@@ -3,6 +3,7 @@ package fieldtype
 import (
 	"fmt"
 
+	"github.com/bitrise-io/step-yml-linter/lint"
 	"gopkg.in/yaml.v3"
 )
 
@@ -10,11 +11,12 @@ import (
 type IO struct {
 	Key     String
 	Value   String
-	Options opts `yaml:"-"`
+	Options Opts `yaml:"-"`
 	l, c    int
+	Parent  *String
 }
 
-type opts struct {
+type Opts struct {
 	IsExpand          Bool                   `yaml:"is_expand,omitempty"`
 	SkipIfEmpty       Bool                   `yaml:"skip_if_empty,omitempty"`
 	Title             String                 `yaml:"title,omitempty"`
@@ -28,10 +30,11 @@ type opts struct {
 	IsSensitive       Bool                   `yaml:"is_sensitive,omitempty"`
 	Unset             Bool                   `yaml:"unset,omitempty"`
 	Meta              map[String]interface{} `yaml:"meta,omitempty"`
+	Parent            *String
 }
 
 type input struct {
-	Options opts `yaml:"opts,omitempty"`
+	Options Opts `yaml:"opts,omitempty"`
 }
 
 // UnmarshalYAML ...
@@ -62,6 +65,9 @@ func (t *IO) UnmarshalYAML(node *yaml.Node) error {
 			if err := value.Decode(&t.Value); err != nil {
 				return err
 			}
+		} else {
+			t.Options.Parent = &String{}
+			*t.Options.Parent = key
 		}
 	}
 
@@ -76,4 +82,59 @@ func (t IO) Line() int {
 // Column ...
 func (t IO) Column() int {
 	return t.c
+}
+
+// Line ...
+func (t Opts) Line() int {
+	return t.Parent.l
+}
+
+// Column ...
+func (t Opts) Column() int {
+	return t.Parent.c
+}
+
+// IsEmpty ...
+func (t Opts) IsEmpty() bool {
+	if t.Parent == nil {
+		return false
+	}
+	return t.Parent.c == 0 || t.Parent.l == 0
+}
+
+// ParentField ...
+func (t Opts) ParentField() lint.Field {
+	if t.Parent == nil {
+		return nil
+	}
+	return *t.Parent
+}
+
+// IsEmpty ...
+func (t IO) IsEmpty() bool {
+	return t.c == 0 || t.l == 0
+}
+
+// ParentField ...
+func (t IO) ParentField() lint.Field {
+	if t.Parent == nil {
+		return nil
+	}
+	return *t.Parent
+}
+
+// FieldName ...
+func (t IO) FieldName() string {
+	if t := t.Parent; t != nil {
+		return t.Value
+	}
+	return ""
+}
+
+// FieldName ...
+func (t Opts) FieldName() string {
+	if t := t.Parent; t != nil {
+		return t.Value
+	}
+	return ""
 }

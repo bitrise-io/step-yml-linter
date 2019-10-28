@@ -6,6 +6,9 @@ import "fmt"
 type Field interface {
 	Line() int
 	Column() int
+	IsEmpty() bool
+	ParentField() Field
+	FieldName() string
 }
 
 var filePath string
@@ -17,5 +20,15 @@ func SetFilePath(path string) {
 
 // Log ...
 func Log(f Field, message string) {
-	fmt.Printf("%s:%d:%d: %s\n", filePath, f.Line(), f.Column(), message)
+	sss := ""
+	for {
+		sss = f.FieldName() + ">" + sss
+		f = f.ParentField()
+		if f == nil {
+			break
+		}
+		if !f.IsEmpty() {
+			fmt.Printf("%s:%d:%d: %s %s\n", filePath, f.Line(), f.Column(), sss, message)
+		}
+	}
 }

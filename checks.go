@@ -29,4 +29,13 @@ var checks = []func(step.YML){
 			lint.Log(s.Description, "description is required")
 		}
 	},
+
+	// inputs
+	func(s step.YML) {
+		for _, inp := range s.Inputs {
+			if len(inp.Options.Description.Value) == 0 {
+				lint.Log(inp.Options.Description, "description is required")
+			}
+		}
+	},
 }
